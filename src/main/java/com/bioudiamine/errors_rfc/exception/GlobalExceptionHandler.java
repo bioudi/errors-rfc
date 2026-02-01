@@ -5,7 +5,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -42,23 +41,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
   }
 
-  @Override
-  protected ResponseEntity<Object> handleExceptionInternal(
-      Exception ex,
-      @Nullable Object body,
-      HttpHeaders headers,
-      HttpStatusCode statusCode,
-      WebRequest request) {
-
-    String errorCode = ex.getClass().getSimpleName().toLowerCase().replace("exception", "-error");
-    ExtendedProblemDetail problemDetail = ExtendedProblemDetail.forStatusAndDetail(
-        HttpStatus.valueOf(statusCode.value()), ex.getMessage(), errorCode);
-    problemDetail.setInstance(URI.create(request.getDescription(false).replace("uri=", "")));
-    problemDetail.addError(errorCode.toUpperCase(), ex.getMessage());
-
-    return ResponseEntity.status(statusCode).body(problemDetail);
-  }
-
   @ExceptionHandler(InvalidInputException.class)
   public ResponseEntity<ExtendedProblemDetail> handleInvalidInputException(InvalidInputException e, WebRequest request) {
     String code = e.getCode();
@@ -71,11 +53,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ExtendedProblemDetail> handleAllExceptions(Exception e, WebRequest request) {
-    String errorCode = "internal-server-error";
     ExtendedProblemDetail problemDetail = ExtendedProblemDetail.forStatusAndDetail(
-        HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), errorCode);
+        HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     problemDetail.setInstance(URI.create(request.getDescription(false).replace("uri=", "")));
-    problemDetail.addError(errorCode.toUpperCase(), e.getMessage());
 
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problemDetail);
   }

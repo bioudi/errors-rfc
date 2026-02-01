@@ -40,10 +40,6 @@ public class ExtendedProblemDetail extends ProblemDetail {
     syncErrorsProperty();
   }
 
-  public List<ErrorMessage> getErrors() {
-    return errors;
-  }
-
   private void syncErrorsProperty() {
     setProperty("errors", errors);
   }
