@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(./mvnw spring-boot:run:*)",
+      "Bash(java:*)",
+      "Bash(/usr/libexec/java_home:*)",
+      "Bash(JAVA_HOME=/Users/amine/Library/Java/JavaVirtualMachines/corretto-23.0.2/Contents/Home ./mvnw spring-boot:run:*)",
+      "Bash(lsof:*)",
+      "Bash(kill:*)",
+      "Bash(curl:*)",
+      "Bash(xargs kill:*)",
+      "Bash(echo:*)",
+      "Bash(/usr/bin/git init /Users/amine/Projects/errors-rfc)",
+      "Bash(git init:*)",
+      "Bash(/opt/homebrew/bin/git --version)",
+      "Bash(/usr/local/bin/git --version)",
+      "Bash(gh auth:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}
