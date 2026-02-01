@@ -29,13 +29,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
       WebRequest request) {
 
     ExtendedProblemDetail problemDetail = ExtendedProblemDetail.forStatusAndDetail(
-        HttpStatus.BAD_REQUEST, "Validation failed");
+        HttpStatus.BAD_REQUEST, "Validation failed", "validation-error");
     problemDetail.setInstance(URI.create(request.getDescription(false).replace("uri=", "")));
 
     ex.getBindingResult().getFieldErrors().forEach(error -> {
         String code = error.getDefaultMessage();
         String message = messageService.getMessage(code);
-        problemDetail.addMessage(code, message);
+        String field = error.getField();
+        problemDetail.addError(code, message, field);
     });
 
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
@@ -49,30 +50,32 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
       HttpStatusCode statusCode,
       WebRequest request) {
 
+    String errorCode = ex.getClass().getSimpleName().toLowerCase().replace("exception", "-error");
     ExtendedProblemDetail problemDetail = ExtendedProblemDetail.forStatusAndDetail(
-        HttpStatus.valueOf(statusCode.value()), ex.getMessage());
+        HttpStatus.valueOf(statusCode.value()), ex.getMessage(), errorCode);
     problemDetail.setInstance(URI.create(request.getDescription(false).replace("uri=", "")));
-    problemDetail.addMessage(ex.getClass().getSimpleName().toUpperCase(), ex.getMessage());
+    problemDetail.addError(errorCode.toUpperCase(), ex.getMessage());
 
     return ResponseEntity.status(statusCode).body(problemDetail);
   }
 
   @ExceptionHandler(InvalidInputException.class)
-  public ExtendedProblemDetail handleInvalidInputException(InvalidInputException e, WebRequest request) {
+  public ResponseEntity<ExtendedProblemDetail> handleInvalidInputException(InvalidInputException e, WebRequest request) {
     String code = e.getCode();
     String message = messageService.getMessage(code);
-    ExtendedProblemDetail problemDetail = ExtendedProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
+    ExtendedProblemDetail problemDetail = ExtendedProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message, code);
     problemDetail.setInstance(URI.create(request.getDescription(false).replace("uri=", "")));
-    problemDetail.addMessage(code, message);
-    return problemDetail;
+    problemDetail.addError(code, message);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
   }
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ExtendedProblemDetail> handleAllExceptions(Exception e, WebRequest request) {
+    String errorCode = "internal-server-error";
     ExtendedProblemDetail problemDetail = ExtendedProblemDetail.forStatusAndDetail(
-        HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), errorCode);
     problemDetail.setInstance(URI.create(request.getDescription(false).replace("uri=", "")));
-    problemDetail.addMessage(e.getClass().getSimpleName().toUpperCase(), e.getMessage());
+    problemDetail.addError(errorCode.toUpperCase(), e.getMessage());
 
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problemDetail);
   }
