@@ -16,7 +16,20 @@
       "Bash(/opt/homebrew/bin/git --version)",
       "Bash(/usr/local/bin/git --version)",
       "Bash(gh auth:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(gh repo create:*)",
+      "Bash(./mvnw compile:*)",
+      "Bash(python3:*)",
+      "Bash(pkill:*)",
+      "Bash(git push)",
+      "Bash(gh repo view:*)",
+      "Bash(./mvnw test:*)",
+      "Bash(./mvnw dependency:tree:*)",
+      "Bash(jar -tf:*)",
+      "Bash(./mvnw dependency:resolve:*)",
+      "Bash(serialver:*)",
+      "Bash(mvn clean install:*)"
     ]
   }
 }
